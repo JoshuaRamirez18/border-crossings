@@ -1,0 +1,108 @@
+---
+title: "Final Project"
+author: "Joshua Ramirez-Capistran"
+format: html
+editor: visual
+---
+
+# Data
+
+```{r}
+library(tidyverse)
+
+border_crossings <- read_csv("data/Border_Crossing_Entry_Data.csv")
+```
+
+Background: I will be using the Border Crossing Entry Data, that I found using data.gov, which is a credible source for data. The variables in the data set would be Port Name, State, Port Code, Border, Date, Measure, Value, Latitude, Longitude, Point.
+
+Numerical Continuous: Latitude, Longitude, Point
+
+Numerical Discrete: Date, Value
+
+Categorical Ordinal: Port Code
+
+Categorical Nominal: Port Name, State, Border, Measure
+
+These variables will show all sorts of things, like locations, entry point, vehicle type (measure), and the amount of people in each vehicle (value).
+
+# Questions
+
+1)  What is the distribution of the number of crossings at U.S. border entry points?
+
+2)  How does the number of crossings (value) differ between the U.S.-Canada and U.S.-Mexico borders?
+
+3)  What is the geographic distribution of U.S. border entry points based on their latitude and longitude?
+
+4)  How do geographic location (latitude and longitude) and border type (U.S.-Canada vs. U.S.-Mexico) predict the number of crossings at U.S. border entry points?
+
+# Descriptive Analysis
+
+Histogram:
+
+```{r}
+border_crossings |>
+  ggplot(aes(x = Value)) +
+  geom_histogram()
+```
+
+Boxplot:
+
+```{r}
+border_crossings |>
+  ggplot(aes(x = Border)) +
+  geom_boxplot()
+
+```
+
+Scatterplot:
+
+```{r}
+border_crossings |>
+  ggplot(aes(y = Longitude, x = Latitude)) +
+  geom_point()
+
+```
+
+Calculate mean, standard deviation, minimum and maximum of at least one numeric variable by a group
+
+```{r}
+border_crossings |>
+  group_by(Border) |>
+  summarize(mean = mean(Value, na.rm = TRUE),
+            median = median(Value, na.rm = TRUE),
+            max = max(Value, na.rm = TRUE),
+            min = min(Value, na.rm = TRUE),
+            sd = sd(Value, na.rm = TRUE))
+```
+
+# Inferential Statistics
+
+Linear Regression:
+
+```{r}
+model <- lm(Value ~ Latitude + Longitude + Border, 
+            data = border_crossings)
+
+summary(model)
+
+```
+
+Analysis:
+
+R-squared = 0.054
+
+The model explains \~5.4% of the variation in value (not very strong — but common for geographic/social data)
+
+All variables are statistically significant (p \< 0.05)
+
+Border type and geographic location (latitude & longitude) significantly predict the number of crossings.
+
+There are more crossings at the US-Mexico border.
+
+Locations further north and east tend to have fewer crossings
+
+# Conclusion
+
+For my analysis, I explored patterns in the U.S. Border Crossing Entry Data by examining the distribution and relationships of border traffic volume (value). I first visualized the distribution of crossing counts with a histogram, which showed that most entry points experience a low to moderate number of crossings and few high traffic locations. A boxplot was used to compare crossings by border which revealed that the U.S.-Mexico border essentially has higher crossing counts than the U.S. - Canada Border. A scatterplot was used for the entry point locations (latitude vs. longitude) and showed the geographic spread of ports, with clusters representing each countries border. I also summarized the number of crossings by border type, calculating mean, standard deviation, minimum and maximum values. It confirmed that U.S. - Mexico border crossings were much more than the U.S. - Canada Border.
+
+After, I did a linear regression model using latitude, longitude, and border type. The regression results showed that the crossings are significantly higher at the U.S. - Mexico border compared to the U.S. - Canada border. Although the model explains about 5.4% of the variation in crossing counts, all variables were statistically significant, stating that geographic location and border type do play roles and influence crossings at U.S. entry points.
